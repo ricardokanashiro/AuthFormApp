@@ -17,6 +17,8 @@ const SignInForm = () => {
       senha: "", role: ""
    })
 
+   const [loginData, setLoginData] = useState({})
+
    const router = useRouter()
 
    async function createUser() {
