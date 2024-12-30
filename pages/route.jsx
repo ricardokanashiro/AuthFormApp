@@ -1,10 +1,10 @@
 import RouteCard from "../components/RouteCard"
 
-const Route = () => {
+const Route = ({ loginData }) => {
    return (
       <div className="w-full h-full p-[4rem]">
 
-         <h1 className="font-bold text-[3rem]">Bem Vindo Ricardo!</h1>
+         <h1 className="font-bold text-[3rem]">Bem Vindo {loginData.nome}!</h1>
 
          <div className="mt-[4rem]">
 

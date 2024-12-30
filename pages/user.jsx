@@ -6,16 +6,16 @@ const ListItem = ({ label, value }) => {
    )
 }
 
-const User = () => {
+const User = ({ loginData }) => {
    return (
       <div className="p-[4rem]">
 
-         <h2 className="font-bold text-[3rem]">Ricardo Kanashiro</h2>
+         <h2 className="font-bold text-[3rem]">{loginData.nome}</h2>
 
          <ul className="mt-[2rem]">
-            <ListItem label="Email" value="ricardo@gmail.com" />
-            <ListItem label="Role" value="user" />
-            <ListItem label="Provider" value="local" />
+            <ListItem label="Email" value={loginData.email} />
+            <ListItem label="Role" value={loginData.role} />
+            <ListItem label="Provider" value={loginData.provider} />
          </ul>
 
          <p className="mt-[3rem] mb-[2rem] font-medium text-[#919190] text-[1.5rem]">Actions</p>

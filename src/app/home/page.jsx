@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 import MenuBtn from "../../../components/MenuBtn"
 import Route from "../../../pages/route"
@@ -9,6 +10,53 @@ import User from "../../../pages/user"
 const page = () => {
 
    const [pageSelected, setPageSelected] = useState("routes")
+   const [loginData, setLoginData] = useState({})
+
+   const router = useRouter()
+
+   function logOut() {
+      router.push("/")
+      localStorage.clear()
+      setLoginData({})
+   }
+
+   useEffect(() => {
+      
+      async function validate() {
+
+         const loginDataItem = localStorage.getItem("loginData") ?? ""
+         let loginData
+
+         if(loginDataItem) {
+            loginData = JSON.parse(loginDataItem)
+         }
+
+         if(!loginDataItem || !loginData.token || !loginData) {
+            router.push('/')
+            setLoginData({})
+            return
+         }
+
+         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
+            method: "POST",
+            headers: { 
+               'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ token: loginData.token })
+         })
+
+         if(!response.ok) {
+            router.push('/')
+            setLoginData({})
+            return
+         }
+
+         setLoginData(loginData)
+      }
+
+      validate()
+
+   }, [])
 
    return (
       <div className="flex w-full h-full">
@@ -44,7 +92,7 @@ const page = () => {
 
             <div className="flex-1 flex flex-col justify-end">
 
-               <button className="flex p-[.8rem] justify-start items-center border-[#919190] border-[.2rem] border-solid rounded-[.4rem]">
+               <button className="flex p-[.8rem] justify-start items-center border-[#919190] border-[.2rem] border-solid rounded-[.4rem]" onClick={logOut}>
                   <img src="/icon-log-out.svg" alt="logout icon" className="w-[2rem]" />
                   <p className="text-[#919190] font-semibold text-[1.4rem] flex-1 text-center ml-[-1rem]">Logout</p>
                </button>
@@ -54,8 +102,8 @@ const page = () => {
          </div>
 
          <div>
-            { pageSelected === "routes" && <Route /> }
-            { pageSelected === "user" && <User /> }
+            { pageSelected === "routes" && <Route loginData={loginData} /> }
+            { pageSelected === "user" && <User loginData={loginData} /> }
          </div>
 
       </div>

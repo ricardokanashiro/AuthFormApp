@@ -1,9 +1,9 @@
-import Form from "../../components/Form"
+import SignInForm from "../../components/SignInForm"
 
 const page = () => {
    return (
       <div className="w-full h-full">
-         <Form />
+         <SignInForm />
       </div>
    )
 }

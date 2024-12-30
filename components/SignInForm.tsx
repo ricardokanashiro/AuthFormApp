@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 import TextField from "@mui/material/TextField"
 import Radio from '@mui/material/Radio'
@@ -10,7 +10,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 
-const Form = () => {
+const SignInForm = () => {
 
    const [signInCredentials, setSignInCredentials] = useState({
       nome: "", email: "",
@@ -21,7 +21,7 @@ const Form = () => {
 
    async function createUser() {
 
-      const response = await fetch("http://localhost:3000/api/user", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/signin`, {
          method: "POST",
          headers: {
             "Content-Type": "application/json"
@@ -34,14 +34,48 @@ const Form = () => {
          })
       })
 
+      const data = await response.json()
+
       if(response.ok) {
+         router.push('/home')
+         localStorage.setItem('loginData', JSON.stringify(data))
+      }
+   }
+
+   useEffect(() => {
+      
+      async function validate() {
+
+         const loginDataItem = localStorage.getItem("loginData") ?? ""
+         let loginData
+
+         if(loginDataItem) {
+            loginData = JSON.parse(loginDataItem)
+         }
+
+         if(!loginData || !loginData.token) {
+            return 
+         }
+
+         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
+            method: "POST",
+            headers: { 
+               'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ token: loginData.token })
+         })
+
+         if(!response.ok) {
+            localStorage.clear()
+            return
+         }
+
          router.push('/home')
       }
 
-      const data = await response.json()
+      validate()
 
-      console.log(data)
-   }
+   }, [])
 
    return (
       
@@ -176,7 +210,7 @@ const Form = () => {
                      </FormControl>
 
                      <button type="submit" className="bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem]" onClick={createUser}>
-                        Logar
+                        Cadastrar
                      </button>
 
                      <div className="w-full flex items-center gap-[5px] mt-[2rem] mb-[2rem]">
@@ -189,7 +223,7 @@ const Form = () => {
 
                      <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]">
                         <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
-                        <p className="text-[1.1rem]">Logar com Conta Google</p>
+                        <p className="text-[1.1rem]">Cadastrar com Conta Google</p>
                      </button>
 
                   </div>
@@ -199,7 +233,7 @@ const Form = () => {
             </div>
 
             <p>
-               Já tem uma conta? Cadastre-se <a href="#" className="text-[#3b37ff] font-semibold">Aqui</a>.
+               Já tem uma conta? Cadastre-se <a href="/login" className="text-[#3b37ff] font-semibold">Aqui</a>.
             </p>
 
          </div>
@@ -208,4 +242,4 @@ const Form = () => {
    )
 }
 
-export default Form
+export default SignInForm

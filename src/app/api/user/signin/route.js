@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken"
-import { User } from "../../../../database/models/User"
+import bcrypt from "bcrypt"
+
+import { User } from "../../../../../database/models/User"
 
 export async function POST(request) {
 
@@ -8,14 +10,20 @@ export async function POST(request) {
 
    let errors = []
 
+   const hashedPassword = await bcrypt.hash(senha, 10)
+
    await User.create({
       nome: nome,
       email: email,
-      senha: senha,
+      senha: hashedPassword,
       role: role,
       provider: "local"
    })
    .catch(error => errors.push(error))
+
+   if(senha.length > 20) {
+      errors.push({ message: "PASSWORD_TOO_LONG" })
+   }
 
    if(errors.length > 0) {
 
@@ -43,14 +51,12 @@ export async function POST(request) {
          return error.message
       })
 
-      return new Response(JSON.stringify({ "errors": formatedErrors }, { status: 400 }))
+      return new Response(JSON.stringify({ errors: formatedErrors }), { status: 400 })
    }
 
-   const user = { nome, email, role }
+   const user = { nome, email, role, provider: "local" }
 
    const token = jwt.sign(user, process.env.JWT_SECRET_KEY)
-
-   jwt.verify()
    
-   return new Response(JSON.stringify({ token, nome, email, senha, provider: "local" }), { status: 200 })
+   return new Response(JSON.stringify({ token, nome, email, role, provider: "local" }), { status: 200 })
 }
