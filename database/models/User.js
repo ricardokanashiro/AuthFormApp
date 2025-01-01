@@ -14,7 +14,7 @@ userSchema.path("senha").validate(function(value) {
       throw new Error("PASSWORD_REQUIRED")
    }
 
-   if(value.length > 60) {
+   if(value && value.length > 60) {
       throw new Error("PASSWORD_TOO_LONG")
    }
 

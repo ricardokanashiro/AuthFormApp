@@ -16,7 +16,8 @@ export default {
         foreground: "var(--foreground)",
       },
       boxShadow: {
-        'custom': "rgba(149, 157, 165, 0.2) 0px 8px 24px"
+        'custom': "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+        'custom-darker': "rgba(0, 0, 0, 0.25) 0px 4px 12px"
       }
     },
   },

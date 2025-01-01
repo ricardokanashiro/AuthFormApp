@@ -1,6 +1,19 @@
+import { useEffect, useState } from "react"
 import RouteCard from "../components/RouteCard"
 
 const Route = ({ loginData }) => {
+
+   const [isAdm, setIsAdm] = useState(false)
+
+   useEffect(() => {
+      
+      const loginDataItem = localStorage.getItem("loginData")
+      const loginData = JSON.parse(loginDataItem)
+      
+      setIsAdm(loginData.role === "adm")
+
+   }, [])
+
    return (
       <div className="w-full h-full p-[4rem]">
 
@@ -16,12 +29,16 @@ const Route = ({ loginData }) => {
                   image="/unlock.svg"
                   title="Rota Livre"
                   description="Rota permitida para todos os usuários" 
+                  active={true}
+                  action="/home/free-route"
                />
 
                <RouteCard 
                   image="/shield-security.svg" 
                   title="Rota Protegida" 
-                  description="Rota permitida apenas para administradores" 
+                  description="Rota permitida apenas para administradores"
+                  active={isAdm}
+                  action="/home/protected-route"
                />
 
             </div>

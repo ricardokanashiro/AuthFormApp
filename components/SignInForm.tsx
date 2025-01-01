@@ -17,8 +17,6 @@ const SignInForm = () => {
       senha: "", role: ""
    })
 
-   const [loginData, setLoginData] = useState({})
-
    const router = useRouter()
 
    async function createUser() {
@@ -32,42 +30,54 @@ const SignInForm = () => {
             nome: signInCredentials.nome,
             email: signInCredentials.email,
             senha: signInCredentials.senha,
-            role: signInCredentials.role
+            role: signInCredentials.role,
+            provider: "local"
          })
       })
 
       const data = await response.json()
 
-      if(response.ok) {
+      if (response.ok) {
          router.push('/home')
          localStorage.setItem('loginData', JSON.stringify(data))
       }
    }
 
+   async function googleSignIn() {
+
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
+      const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ?? ""
+      const scope = "openid email profile"
+
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${encodeURIComponent(clientId)}&scope=${encodeURIComponent(scope)}&redirect_uri=${encodeURIComponent(redirectUri)}`
+
+      window.location.href = authUrl
+   }
+
    useEffect(() => {
-      
+
       async function validate() {
 
          const loginDataItem = localStorage.getItem("loginData") ?? ""
          let loginData
 
-         if(loginDataItem) {
+         if (loginDataItem) {
             loginData = JSON.parse(loginDataItem)
          }
 
-         if(!loginData || !loginData.token) {
-            return 
+         if (!loginData || !loginData.token) {
+            return
          }
 
          const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
             method: "POST",
-            headers: { 
-               'Content-Type': 'application/json' 
+            headers: {
+               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ token: loginData.token })
          })
 
-         if(!response.ok) {
+         if (!response.ok) {
             localStorage.clear()
             return
          }
@@ -80,7 +90,7 @@ const SignInForm = () => {
    }, [])
 
    return (
-      
+
       <form onSubmit={(e) => e.preventDefault()} className="w-full h-full flex gap-[2rem]">
 
          <div className="bg-[#3b37ff] w-[4rem] h-full flex-[.7] flex flex-col justify-center items-center">
@@ -128,7 +138,7 @@ const SignInForm = () => {
                            },
                            width: '100%'
                         }}
-                        onChange={(e) => setSignInCredentials(prev => ({...prev, nome: e.target.value}))}
+                        onChange={(e) => setSignInCredentials(prev => ({ ...prev, nome: e.target.value }))}
                      />
 
                      <TextField
@@ -149,7 +159,7 @@ const SignInForm = () => {
                            width: '100%',
                            marginTop: '1.6rem'
                         }}
-                        onChange={(e) => setSignInCredentials(prev => ({...prev, email: e.target.value}))}
+                        onChange={(e) => setSignInCredentials(prev => ({ ...prev, email: e.target.value }))}
                      />
 
                      <TextField
@@ -170,14 +180,14 @@ const SignInForm = () => {
                            width: '100%',
                            marginTop: '1.6rem'
                         }}
-                        onChange={(e) => setSignInCredentials(prev => ({...prev, senha: e.target.value}))}
+                        onChange={(e) => setSignInCredentials(prev => ({ ...prev, senha: e.target.value }))}
                      />
 
                      <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '20px' }}>
 
                         <FormLabel style={{ fontSize: '14px', marginRight: '20px' }}>Role</FormLabel>
 
-                        <RadioGroup row onChange={(e) => setSignInCredentials(prev => ({...prev, role: e.target.value}))}>
+                        <RadioGroup row onChange={(e) => setSignInCredentials(prev => ({ ...prev, role: e.target.value }))}>
 
                            <FormControlLabel value="user" control={
 
@@ -223,7 +233,7 @@ const SignInForm = () => {
 
                      </div>
 
-                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]">
+                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={googleSignIn}>
                         <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
                         <p className="text-[1.1rem]">Cadastrar com Conta Google</p>
                      </button>
