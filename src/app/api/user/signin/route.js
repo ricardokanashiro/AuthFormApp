@@ -8,13 +8,16 @@ export async function POST(request) {
    const body = await request.json()
    const { nome, email, senha, role, provider } = body
 
-   console.log(body)
-
    let errors = []
 
-   console.log(senha)
+   const previousUser = await User.findOne({ email, provider })
+
+   if(previousUser) {
+      return new Response(JSON.stringify({ error: { message: "Usuário já está cadastrado!", code: "USER_ALREADY_SIGN_IN" } }), { status: 500 })
+   }
 
    if (senha) {
+
       const hashedPassword = await bcrypt.hash(senha, 10)
 
       await User.create({

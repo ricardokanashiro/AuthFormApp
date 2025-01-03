@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 
 import TextField from "@mui/material/TextField"
@@ -10,6 +10,8 @@ const LogInForm = () => {
    const [logInCredentials, setLogInCredentials] = useState({
       email: "", senha: ""
    })
+
+   const code = useRef("")
 
    const router = useRouter()
 
@@ -23,10 +25,13 @@ const LogInForm = () => {
          body: JSON.stringify({
             email: logInCredentials.email,
             senha: logInCredentials.senha,
+            provider: "local"
          })
       })
 
       const data = await response.json()
+
+      console.log(data)
 
       if(response.ok) {
          router.push('/home')
@@ -34,7 +39,72 @@ const LogInForm = () => {
       }
    }
 
+   async function googleLogIn() {
+
+      const scope = encodeURIComponent("openid email profile")
+      const redirect_uri = encodeURIComponent(process.env.NEXT_PUBLIC_GOOGLE_LOG_IN_REDIRECT_URI ?? "")
+      const client_id = encodeURIComponent(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "")
+      const URL = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}`
+
+      window.location.href = URL
+   }
+
    useEffect(() => {
+
+      let payload: string
+
+      const url = new URLSearchParams(window.location.search)
+      code.current = url.get("code") ?? ""
+
+      async function validateUser() {
+
+         if(!code.current) {
+            return
+         }
+
+         const data: Record<string, string> = {
+            code: code.current,
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "",
+            client_secret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET ?? "",
+            redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_LOG_IN_REDIRECT_URI ?? "",
+            grant_type: "authorization_code"
+         }
+
+         console.log(JSON.stringify(data))
+   
+         await fetch("https://oauth2.googleapis.com/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams(data).toString()
+         })
+            .then((response) => response.json())
+            .then((tokenData) => {
+               const idToken = tokenData.id_token
+               payload = JSON.parse(atob(idToken.split(".")[1]))
+            })
+            .catch((error) => console.error("Erro ao trocar o código pelo token:", error))
+
+         if(!payload) {
+            return
+         }
+
+         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/login`, {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: payload.email, provider: "google" })
+         })
+
+         const fetchData = await response.json()
+
+         console.log(fetchData)
+
+         if(response.ok) {
+            router.push("/home")
+            localStorage.setItem("loginData", JSON.stringify(fetchData))
+         }
+      }
+
+      validateUser()
       
       async function validate() {
 
@@ -45,7 +115,7 @@ const LogInForm = () => {
             loginData = JSON.parse(loginDataItem)
          }
 
-         if(!loginData.token) {
+         if(!loginData || !loginData.token) {
             return
          }
 
@@ -156,7 +226,7 @@ const LogInForm = () => {
 
                      </div>
 
-                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]">
+                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={googleLogIn}>
                         <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
                         <p className="text-[1.1rem]">Logar com Conta Google</p>
                      </button>

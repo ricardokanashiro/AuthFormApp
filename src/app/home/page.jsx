@@ -15,7 +15,7 @@ const page = () => {
    const router = useRouter()
 
    function logOut() {
-      router.push("/")
+      router.push("/login")
       localStorage.clear()
       setLoginData({})
    }
@@ -32,7 +32,7 @@ const page = () => {
          }
 
          if(!loginDataItem || !loginData.token || !loginData) {
-            router.push('/')
+            router.push('/login')
             setLoginData({})
             return
          }

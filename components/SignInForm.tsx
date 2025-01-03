@@ -43,14 +43,14 @@ const SignInForm = () => {
       }
    }
 
-   async function googleSignIn() {
+   function googleSignIn() {
 
       const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
-      const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ?? ""
+      const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_SIGN_IN_REDIRECT_URI ?? ""
       const scope = "openid email profile"
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${encodeURIComponent(clientId)}&scope=${encodeURIComponent(scope)}&redirect_uri=${encodeURIComponent(redirectUri)}`
-
+      
       window.location.href = authUrl
    }
 
