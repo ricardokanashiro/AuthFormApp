@@ -9,13 +9,24 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 
-interface GoogleIdToken {
-   iss: string
-   sub: string
-   email: string
-   email_verified: boolean
-   name?: string
-   picture?: string
+interface SubmitButton {
+   action: () => void,
+   active: boolean
+}
+
+const SubmitButton = ({ action, active }: SubmitButton) => {
+
+   const style = "bg-[#3b37ff] text-white font-semibold text-[1.3rem] p-[1rem] rounded-[.4rem]"
+
+   return (
+      <button
+         type="submit"
+         className={active ? style : style + " opacity-[.7] cursor-default"}
+         onClick={active ? action : () => {}}
+      >
+         Criar conta
+      </button>
+   )
 }
 
 const page = () => {
@@ -42,19 +53,18 @@ const page = () => {
    }
 
    useEffect(() => {
-      
+
       async function fetchUser() {
 
          const queryParams = new URLSearchParams(window.location.search)
          const code = queryParams.get("code") ?? ""
-
-         console.log(code)
 
          const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
          const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_SIGN_IN_REDIRECT_URI ?? ""
          const clientSecret = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET ?? ""
 
          if (!code) {
+            router.push("/login")
             return
          }
 
@@ -85,7 +95,7 @@ const page = () => {
          }
 
          const selectUserRes = await fetch(
-            `${process.env.NEXT_PUBLIC_HOST}/api/user/select?email=${payload.current.email}&provider=google`, 
+            `${process.env.NEXT_PUBLIC_HOST}/api/user/select?email=${payload.current.email}&provider=google`,
             {
                method: "GET"
             }
@@ -166,13 +176,7 @@ const page = () => {
 
                </fieldset>
 
-               <button
-                  type="submit"
-                  className="bg-[#3b37ff] text-white font-semibold text-[1.3rem] p-[1rem] rounded-[.4rem]"
-                  onClick={getGoogleTokens}
-               >
-                  Criar conta
-               </button>
+               <SubmitButton action={getGoogleTokens} active={role !== ""} />
 
             </form>
 

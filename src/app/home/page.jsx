@@ -7,10 +7,13 @@ import MenuBtn from "../../../components/MenuBtn"
 import Route from "../../../pages/route"
 import User from "../../../pages/user"
 
+import HomeSkeleton from "../../../components/HomeSkeleton"
+
 const page = () => {
 
    const [pageSelected, setPageSelected] = useState("routes")
    const [loginData, setLoginData] = useState({})
+   const [isLoading, setisLoading] = useState(true)
 
    const router = useRouter()
 
@@ -21,42 +24,51 @@ const page = () => {
    }
 
    useEffect(() => {
-      
+
+      setisLoading(true)
+
       async function validate() {
 
          const loginDataItem = localStorage.getItem("loginData") ?? ""
          let loginData
 
-         if(loginDataItem) {
+         if (loginDataItem) {
             loginData = JSON.parse(loginDataItem)
          }
 
-         if(!loginDataItem || !loginData.token || !loginData) {
+         if (!loginDataItem || !loginData.token || !loginData) {
             router.push('/login')
             setLoginData({})
+            setisLoading(false)
             return
          }
 
          const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
             method: "POST",
-            headers: { 
-               'Content-Type': 'application/json' 
+            headers: {
+               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ token: loginData.token })
          })
 
-         if(!response.ok) {
+         if (!response.ok) {
             router.push('/')
             setLoginData({})
+            setisLoading(false)
             return
          }
 
          setLoginData(loginData)
+         setisLoading(false)
       }
 
       validate()
 
    }, [])
+
+   if (isLoading) {
+      return (<HomeSkeleton />)
+   }
 
    return (
       <div className="flex w-full h-full">
@@ -72,18 +84,18 @@ const page = () => {
                <ul className="flex flex-col gap-[1rem]">
 
                   <MenuBtn
-                     image="/icon-truck-gray.svg" 
-                     title="Rotas" 
-                     active={pageSelected === "routes"} 
-                     activeImage="/icon-truck.svg" 
+                     image="/icon-truck-gray.svg"
+                     title="Rotas"
+                     active={pageSelected === "routes"}
+                     activeImage="/icon-truck.svg"
                      handleClick={() => setPageSelected("routes")}
                   />
 
                   <MenuBtn
-                     image="/icon-user-gray.svg" 
-                     title="Usuário" 
-                     active={pageSelected === "user"} 
-                     activeImage="/icon-user-1.svg" 
+                     image="/icon-user-gray.svg"
+                     title="Usuário"
+                     active={pageSelected === "user"}
+                     activeImage="/icon-user-1.svg"
                      handleClick={() => setPageSelected("user")}
                   />
 
@@ -102,12 +114,13 @@ const page = () => {
          </div>
 
          <div>
-            { pageSelected === "routes" && <Route loginData={loginData} /> }
-            { pageSelected === "user" && <User loginData={loginData} /> }
+            {pageSelected === "routes" && <Route loginData={loginData} />}
+            {pageSelected === "user" && <User loginData={loginData} />}
          </div>
 
       </div>
    )
+
 }
 
 export default page

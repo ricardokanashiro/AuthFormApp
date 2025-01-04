@@ -10,12 +10,36 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 
+import FormSkeleton from "./FormSkeleton"
+
+interface ButtonProps {
+   active: boolean,
+   action: () => void
+}
+
+const SubmitButton = ({ active, action }: ButtonProps) => {
+
+   const style = "bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem]"
+
+   return (
+      <button 
+         type="submit" 
+         className={active ? style : style + " opacity-[0.7] cursor-default"}
+         onClick={active ? action : () => {}}
+      >
+         Cadastrar
+      </button>
+   )
+}
+
 const SignInForm = () => {
 
    const [signInCredentials, setSignInCredentials] = useState({
       nome: "", email: "",
       senha: "", role: ""
    })
+
+   const [isLoading, setisLoading] = useState(true)
 
    const router = useRouter()
 
@@ -50,7 +74,7 @@ const SignInForm = () => {
       const scope = "openid email profile"
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${encodeURIComponent(clientId)}&scope=${encodeURIComponent(scope)}&redirect_uri=${encodeURIComponent(redirectUri)}`
-      
+
       window.location.href = authUrl
    }
 
@@ -66,6 +90,7 @@ const SignInForm = () => {
          }
 
          if (!loginData || !loginData.token) {
+            setisLoading(false)
             return
          }
 
@@ -79,15 +104,21 @@ const SignInForm = () => {
 
          if (!response.ok) {
             localStorage.clear()
+            setisLoading(false)
             return
          }
 
          router.push('/home')
+         setisLoading(false)
       }
 
       validate()
 
    }, [])
+
+   if(isLoading) {
+      return ( <FormSkeleton /> )
+   }
 
    return (
 
@@ -221,9 +252,13 @@ const SignInForm = () => {
 
                      </FormControl>
 
-                     <button type="submit" className="bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem]" onClick={createUser}>
-                        Cadastrar
-                     </button>
+                     <SubmitButton
+                        action={createUser} 
+                        active={
+                           signInCredentials.nome !== "" && signInCredentials.email !== ""
+                           && signInCredentials.senha !== "" && signInCredentials.role !== ""
+                        }
+                     />
 
                      <div className="w-full flex items-center gap-[5px] mt-[2rem] mb-[2rem]">
 

@@ -5,11 +5,35 @@ import { useRouter } from "next/navigation"
 
 import TextField from "@mui/material/TextField"
 
+import FormSkeleton from "./FormSkeleton"
+
+interface SubmitButtonProps {
+   action: () => void,
+   active: boolean
+}
+
+const SubmitButton = ({ action, active }: SubmitButtonProps) => {
+
+   const style = "bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem]"
+
+   return (
+      <button 
+         type="submit" 
+         className={active ? style : style + " opacity-[.7] cursor-default"} 
+         onClick={active ? action : () => {}}
+      >
+         Logar
+      </button>
+   )
+}
+
 const LogInForm = () => {
 
    const [logInCredentials, setLogInCredentials] = useState({
       email: "", senha: ""
    })
+
+   const [isLoading, setIsLoading] = useState(true)
 
    const code = useRef("")
 
@@ -31,9 +55,7 @@ const LogInForm = () => {
 
       const data = await response.json()
 
-      console.log(data)
-
-      if(response.ok) {
+      if (response.ok) {
          router.push('/home')
          localStorage.setItem('loginData', JSON.stringify(data))
       }
@@ -58,7 +80,7 @@ const LogInForm = () => {
 
       async function validateUser() {
 
-         if(!code.current) {
+         if (!code.current) {
             return
          }
 
@@ -70,8 +92,6 @@ const LogInForm = () => {
             grant_type: "authorization_code"
          }
 
-         console.log(JSON.stringify(data))
-   
          await fetch("https://oauth2.googleapis.com/token", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -84,7 +104,7 @@ const LogInForm = () => {
             })
             .catch((error) => console.error("Erro ao trocar o código pelo token:", error))
 
-         if(!payload) {
+         if (!payload) {
             return
          }
 
@@ -96,51 +116,56 @@ const LogInForm = () => {
 
          const fetchData = await response.json()
 
-         console.log(fetchData)
-
-         if(response.ok) {
+         if (response.ok) {
             router.push("/home")
             localStorage.setItem("loginData", JSON.stringify(fetchData))
          }
       }
 
       validateUser()
-      
+
       async function validate() {
 
          const loginDataItem = localStorage.getItem("loginData") ?? ""
          let loginData
 
-         if(loginDataItem) {
+         if (loginDataItem) {
             loginData = JSON.parse(loginDataItem)
          }
 
-         if(!loginData || !loginData.token) {
+         if (!loginData || !loginData.token) {
+            setIsLoading(false)
             return
          }
 
          const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
             method: "POST",
-            headers: { 
-               'Content-Type': 'application/json' 
+            headers: {
+               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ token: loginData.token })
          })
 
-         if(!response.ok) {
+         if (!response.ok) {
             localStorage.clear()
+            setIsLoading(false)
             return
          }
 
          router.push('/home')
+         setIsLoading(false)
       }
 
       validate()
 
    }, [])
 
+   if(isLoading) {
+      return ( <FormSkeleton /> )
+   }
+
    return (
-      
+
       <form onSubmit={(e) => e.preventDefault()} className="w-full h-full flex gap-[2rem]">
 
          <div className="bg-[#3b37ff] w-[4rem] h-full flex-[.7] flex flex-col justify-center items-center">
@@ -190,7 +215,7 @@ const LogInForm = () => {
                            width: '100%',
                            marginTop: '1.6rem'
                         }}
-                        onChange={(e) => setLogInCredentials(prev => ({...prev, email: e.target.value}))}
+                        onChange={(e) => setLogInCredentials(prev => ({ ...prev, email: e.target.value }))}
                      />
 
                      <TextField
@@ -211,12 +236,16 @@ const LogInForm = () => {
                            width: '100%',
                            marginTop: '1.6rem'
                         }}
-                        onChange={(e) => setLogInCredentials(prev => ({...prev, senha: e.target.value}))}
+                        onChange={(e) => setLogInCredentials(prev => ({ ...prev, senha: e.target.value }))}
                      />
 
-                     <button type="submit" className="bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem]" onClick={createUser}>
-                        Logar
-                     </button>
+                     <SubmitButton 
+                        action={createUser}
+                        active={
+                           logInCredentials.email !== "" 
+                           && logInCredentials.senha !== ""
+                        } 
+                     />
 
                      <div className="w-full flex items-center gap-[5px] mt-[2rem] mb-[2rem]">
 

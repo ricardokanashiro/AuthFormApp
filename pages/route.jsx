@@ -9,6 +9,10 @@ const Route = ({ loginData }) => {
       
       const loginDataItem = localStorage.getItem("loginData")
       const loginData = JSON.parse(loginDataItem)
+
+      if(!loginData) {
+         return
+      }
       
       setIsAdm(loginData.role === "adm")
 
