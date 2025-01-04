@@ -34,7 +34,7 @@ const page = () => {
    const router = useRouter()
    const [role, setRole] = useState("")
 
-   const payload = useRef({})
+   const payload = useRef<any>({})
 
    async function getGoogleTokens() {
 
