@@ -4,25 +4,27 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 
 import TextField from "@mui/material/TextField"
+import CircularProgress from "@mui/material/CircularProgress"
 
 import FormSkeleton from "./FormSkeleton"
 
 interface SubmitButtonProps {
    action: () => void,
-   active: boolean
+   active: boolean,
+   isLoading: boolean
 }
 
-const SubmitButton = ({ action, active }: SubmitButtonProps) => {
+const SubmitButton = ({ action, active, isLoading }: SubmitButtonProps) => {
 
-   const style = "bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem]"
+   const style = "bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem] flex justify-center items-center"
 
    return (
       <button 
          type="submit" 
          className={active ? style : style + " opacity-[.7] cursor-default"} 
-         onClick={active ? action : () => {}}
+         onClick={(active && !isLoading) ? action : () => {}}
       >
-         Logar
+         { isLoading ? <CircularProgress size={20} sx={{ color: '#FFF' }} /> : "Logar" }
       </button>
    )
 }
@@ -34,12 +36,16 @@ const LogInForm = () => {
    })
 
    const [isLoading, setIsLoading] = useState(true)
+   const [fetchLoading, setFetchLoading] = useState(false)
+   const [fetchGoogleLoading, setFetchGoogleLoading] = useState(false)
 
    const code = useRef("")
 
    const router = useRouter()
 
-   async function createUser() {
+   async function login() {
+
+      setFetchLoading(true)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/login`, {
          method: "POST",
@@ -59,6 +65,8 @@ const LogInForm = () => {
          router.push('/home')
          localStorage.setItem('loginData', JSON.stringify(data))
       }
+
+      setFetchLoading(false)
    }
 
    async function googleLogIn() {
@@ -84,6 +92,8 @@ const LogInForm = () => {
             return
          }
 
+         setFetchGoogleLoading(true)
+
          const data: Record<string, string> = {
             code: code.current,
             client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "",
@@ -105,6 +115,7 @@ const LogInForm = () => {
             .catch((error) => console.error("Erro ao trocar o código pelo token:", error))
 
          if (!payload) {
+            setFetchGoogleLoading(false)
             return
          }
 
@@ -120,6 +131,8 @@ const LogInForm = () => {
             router.push("/home")
             localStorage.setItem("loginData", JSON.stringify(fetchData))
          }
+
+         setFetchGoogleLoading(false)
       }
 
       validateUser()
@@ -240,11 +253,12 @@ const LogInForm = () => {
                      />
 
                      <SubmitButton 
-                        action={createUser}
+                        action={login}
                         active={
                            logInCredentials.email !== "" 
                            && logInCredentials.senha !== ""
-                        } 
+                        }
+                        isLoading={fetchLoading}
                      />
 
                      <div className="w-full flex items-center gap-[5px] mt-[2rem] mb-[2rem]">
@@ -256,8 +270,14 @@ const LogInForm = () => {
                      </div>
 
                      <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={googleLogIn}>
-                        <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
-                        <p className="text-[1.1rem]">Logar com Conta Google</p>
+                        { fetchGoogleLoading 
+                           ? <CircularProgress size={20} sx={{ color: '#000' }} />
+                           : <>
+                              <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
+                              <p className="text-[1.1rem]">Logar com Conta Google</p>
+                           </> 
+                        }
+                        
                      </button>
 
                   </div>

@@ -9,25 +9,27 @@ import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
+import CircularProgress from "@mui/material/CircularProgress"
 
 import FormSkeleton from "./FormSkeleton"
 
 interface ButtonProps {
    active: boolean,
-   action: () => void
+   action: () => void,
+   isLoading: boolean
 }
 
-const SubmitButton = ({ active, action }: ButtonProps) => {
+const SubmitButton = ({ active, action, isLoading }: ButtonProps) => {
 
-   const style = "bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem]"
+   const style = "bg-[#3b37ff] mt-[4rem] text-white w-full font-medium text-[1.4rem] h-[4rem] rounded-[.4rem] flex justify-center items-center"
 
    return (
       <button 
          type="submit" 
          className={active ? style : style + " opacity-[0.7] cursor-default"}
-         onClick={active ? action : () => {}}
+         onClick={(active && !isLoading) ? action : () => {}}
       >
-         Cadastrar
+         { isLoading ? <CircularProgress size={20} sx={{ color: '#FFF' }} /> : "Cadastrar" }
       </button>
    )
 }
@@ -40,10 +42,14 @@ const SignInForm = () => {
    })
 
    const [isLoading, setisLoading] = useState(true)
+   const [fetchLoading, setFetchLoading] = useState(false)
+   const [fetchGoogleLoading, setFetchGoogleLoading] = useState(false)
 
    const router = useRouter()
 
    async function createUser() {
+
+      setFetchLoading(true)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/signin`, {
          method: "POST",
@@ -65,6 +71,8 @@ const SignInForm = () => {
          router.push('/home')
          localStorage.setItem('loginData', JSON.stringify(data))
       }
+
+      setFetchLoading(false)
    }
 
    function googleSignIn() {
@@ -94,6 +102,8 @@ const SignInForm = () => {
             return
          }
 
+         setFetchGoogleLoading(true)
+
          const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
             method: "POST",
             headers: {
@@ -105,11 +115,13 @@ const SignInForm = () => {
          if (!response.ok) {
             localStorage.clear()
             setisLoading(false)
+            setFetchGoogleLoading(false)
             return
          }
 
          router.push('/home')
          setisLoading(false)
+         setFetchGoogleLoading(false)
       }
 
       validate()
@@ -258,6 +270,7 @@ const SignInForm = () => {
                            signInCredentials.nome !== "" && signInCredentials.email !== ""
                            && signInCredentials.senha !== "" && signInCredentials.role !== ""
                         }
+                        isLoading={fetchLoading}
                      />
 
                      <div className="w-full flex items-center gap-[5px] mt-[2rem] mb-[2rem]">
@@ -269,8 +282,15 @@ const SignInForm = () => {
                      </div>
 
                      <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={googleSignIn}>
-                        <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
-                        <p className="text-[1.1rem]">Cadastrar com Conta Google</p>
+
+                        { fetchGoogleLoading ? 
+                           <CircularProgress size={20} sx={{ color: '#000' }} /> 
+                           : <>
+                              <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
+                              <p className="text-[1.1rem]">Cadastrar com Conta Google</p>
+                           </>
+                        }
+                        
                      </button>
 
                   </div>

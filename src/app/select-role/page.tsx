@@ -8,13 +8,15 @@ import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
+import CircularProgress from "@mui/material/CircularProgress"
 
 interface SubmitButton {
    action: () => void,
-   active: boolean
+   active: boolean,
+   isLoading: boolean
 }
 
-const SubmitButton = ({ action, active }: SubmitButton) => {
+const SubmitButton = ({ action, active, isLoading }: SubmitButton) => {
 
    const style = "bg-[#3b37ff] text-white font-semibold text-[1.3rem] p-[1rem] rounded-[.4rem]"
 
@@ -22,9 +24,9 @@ const SubmitButton = ({ action, active }: SubmitButton) => {
       <button
          type="submit"
          className={active ? style : style + " opacity-[.7] cursor-default"}
-         onClick={active ? action : () => {}}
+         onClick={(active && !isLoading) ? action : () => {}}
       >
-         Criar conta
+         { isLoading ? <CircularProgress size={20} sx={{ color: '#FFF' }} /> : "Criar conta" }
       </button>
    )
 }
@@ -32,11 +34,15 @@ const SubmitButton = ({ action, active }: SubmitButton) => {
 const page = () => {
 
    const router = useRouter()
+
    const [role, setRole] = useState("")
+   const [fetchLoading, setFetchLoading] = useState(false)
 
    const payload = useRef<any>({})
 
    async function getGoogleTokens() {
+
+      setFetchLoading(true)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/signin`, {
          method: "POST",
@@ -50,6 +56,8 @@ const page = () => {
          router.push('/home')
          localStorage.setItem('loginData', JSON.stringify(fetchData))
       }
+
+      setFetchLoading(false)
    }
 
    useEffect(() => {
@@ -95,8 +103,7 @@ const page = () => {
          }
 
          const selectUserRes = await fetch(
-            `${process.env.NEXT_PUBLIC_HOST}/api/user/select?email=${payload.current.email}&provider=google`,
-            {
+            `${process.env.NEXT_PUBLIC_HOST}/api/user/select?email=${payload.current.email}&provider=google`, {
                method: "GET"
             }
          )
@@ -176,7 +183,7 @@ const page = () => {
 
                </fieldset>
 
-               <SubmitButton action={getGoogleTokens} active={role !== ""} />
+               <SubmitButton action={getGoogleTokens} active={role !== ""} isLoading={fetchLoading} />
 
             </form>
 
