@@ -18,6 +18,10 @@ const Route = ({ loginData }) => {
 
    }, [])
 
+   if(!loginData || !loginData.nome) {
+      return
+   }
+
    return (
       <div className="w-full h-full p-[4rem]">
 

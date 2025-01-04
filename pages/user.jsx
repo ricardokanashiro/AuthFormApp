@@ -23,8 +23,6 @@ const User = ({ loginData }) => {
          loginData = JSON.parse(loginDataItem)
       }
 
-      console.log(loginData.token)
-
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/delete`, {
          method: "DELETE",
          headers: { 'Content-Type': 'application/json' },
@@ -35,10 +33,10 @@ const User = ({ loginData }) => {
          localStorage.clear()
          router.push("/")
       }
+   }
 
-      const data = await response.json()
-
-      console.log(data)
+   if(!loginData || loginData.nome) {
+      return
    }
 
    return (
