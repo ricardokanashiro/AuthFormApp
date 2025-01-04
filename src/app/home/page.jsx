@@ -67,7 +67,7 @@ const page = () => {
    }, [])
 
    if (isLoading) {
-      return (<HomeSkeleton />)
+      return <HomeSkeleton />
    }
 
    return (
@@ -117,7 +117,6 @@ const page = () => {
             {pageSelected === "routes" && <Route loginData={loginData} />}
             {pageSelected === "user" && <User loginData={loginData} />}
          </div>
-
       </div>
    )
 
