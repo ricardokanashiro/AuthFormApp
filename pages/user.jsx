@@ -35,7 +35,7 @@ const User = ({ loginData }) => {
       }
    }
 
-   if(!loginData || loginData.nome) {
+   if(!loginData || !loginData.nome) {
       return
    }
 
