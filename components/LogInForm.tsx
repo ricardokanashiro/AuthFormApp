@@ -269,7 +269,7 @@ const LogInForm = () => {
 
                      </div>
 
-                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={googleLogIn}>
+                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={fetchGoogleLoading ? () => {} : googleLogIn}>
                         { fetchGoogleLoading 
                            ? <CircularProgress size={20} sx={{ color: '#000' }} />
                            : <>

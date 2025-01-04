@@ -281,10 +281,10 @@ const SignInForm = () => {
 
                      </div>
 
-                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={googleSignIn}>
+                     <button className="flex items-center justify-center gap-[1rem] w-full border-[1px] border-[#c0c0c0] border-solid rounded-[.4rem] h-[4rem]" onClick={fetchGoogleLoading ? () => {} : googleSignIn}>
 
                         { fetchGoogleLoading ? 
-                           <CircularProgress size={20} sx={{ color: '#000' }} /> 
+                           <CircularProgress size={20} sx={{ color: '#000' }} />
                            : <>
                               <img src="/google-logo.svg" alt="google logo" className="w-[3rem]" />
                               <p className="text-[1.1rem]">Cadastrar com Conta Google</p>
