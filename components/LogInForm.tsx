@@ -73,7 +73,7 @@ const LogInForm = () => {
 
    useEffect(() => {
 
-      let payload: string
+      let payload: any
 
       const url = new URLSearchParams(window.location.search)
       code.current = url.get("code") ?? ""
