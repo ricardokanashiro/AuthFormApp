@@ -40,10 +40,8 @@ const LogInForm = () => {
    const [isLoading, setIsLoading] = useState(true)
    const [fetchLoading, setFetchLoading] = useState(false)
    const [fetchGoogleLoading, setFetchGoogleLoading] = useState(false)
-
-   const url = new URLSearchParams(window.location.search)
-   const error = url.get("error") ?? ""
-   const code = url.get("code") ?? ""
+   const [code, setCode] = useState("")
+   const [error, setError] = useState("")
 
    const router = useRouter()
 
@@ -83,7 +81,11 @@ const LogInForm = () => {
       window.location.href = URL
    }
 
-   useEffect(() => {      
+   useEffect(() => {  
+      
+      const url = new URLSearchParams(window.location.search)
+      setError(url.get("error") ?? "")
+      setCode(url.get("code") ?? "")
 
       async function validate() {
 
