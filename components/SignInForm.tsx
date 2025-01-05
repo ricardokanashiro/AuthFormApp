@@ -46,6 +46,7 @@ const SignInForm = () => {
    const [isLoading, setisLoading] = useState(true)
    const [fetchLoading, setFetchLoading] = useState(false)
    const [fetchGoogleLoading, setFetchGoogleLoading] = useState(false)
+   const [error, setError] = useState("")
 
    const router = useRouter()
 
@@ -97,6 +98,9 @@ const SignInForm = () => {
 
    useEffect(() => {
 
+      const url = new URLSearchParams(window.location.search)
+      setError(url.get('error') ?? "")
+
       async function validate() {
 
          setFetchGoogleLoading(true)
@@ -133,6 +137,14 @@ const SignInForm = () => {
       validate()
 
    }, [])
+
+   useEffect(() => {
+
+      if(error === "USER_NOT_SIGN_IN") {
+         notifyError("O usuário não está cadastrado!")
+      }
+
+   }, [error])
 
    if(isLoading) {
       return ( <FormSkeleton /> )

@@ -49,6 +49,16 @@ const LogInForm = () => {
 
       setFetchLoading(true)
 
+      const userResponse = await fetch(
+         `${process.env.NEXT_PUBLIC_HOST}/api/user/select?email=${logInCredentials.email}&provider=local`,
+         { method: "GET" }
+      )
+
+      if(!userResponse.ok) {
+         window.location.href = `${process.env.NEXT_PUBLIC_HOST}?error=USER_NOT_SIGN_IN`
+         return
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/login`, {
          method: "POST",
          headers: {
@@ -81,7 +91,7 @@ const LogInForm = () => {
       window.location.href = URL
    }
 
-   useEffect(() => {  
+   useEffect(() => {
       
       const url = new URLSearchParams(window.location.search)
       setError(url.get("error") ?? "")
@@ -161,6 +171,16 @@ const LogInForm = () => {
 
          if (!payload) {
             setFetchGoogleLoading(false)
+            return
+         }
+
+         const userResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_HOST}/api/user/select?email=${payload.email}&provider=google`,
+            { method: "GET" }
+         )
+   
+         if(!userResponse.ok) {
+            window.location.href = `${process.env.NEXT_PUBLIC_HOST}?error=USER_NOT_SIGN_IN`
             return
          }
 
