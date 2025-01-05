@@ -3,11 +3,10 @@ import { User } from "../../../../../database/models/User"
 
 export async function POST(request) {
 
-   const body = await request.json()
-   const { token } = body
+   const access_token = request.cookies.get('access_token') ? request.cookies.get('access_token').value : ""
 
    try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET_KEY)
+      const payload = jwt.verify(access_token, process.env.JWT_SECRET_KEY)
       const user = await User.findOne({ email: payload.email, provider: payload.provider })
 
       if(!user) {

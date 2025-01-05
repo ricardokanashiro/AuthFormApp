@@ -17,7 +17,6 @@ const User = ({ loginData }) => {
    async function deleteAccount() {
 
       const loginDataItem = localStorage.getItem("loginData")
-      let loginData
 
       if(loginDataItem) {
          loginData = JSON.parse(loginDataItem)
@@ -29,6 +28,7 @@ const User = ({ loginData }) => {
 
       if(response.ok) {
          localStorage.clear()
+         await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/deleteCookies`, { method: "POST"})
          router.push("/")
       }
    }

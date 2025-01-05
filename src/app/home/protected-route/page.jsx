@@ -18,12 +18,8 @@ const page = () => {
             return
          }
 
-         const loginData = JSON.parse(loginDataItem)
-
          const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validateRole`, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: loginData.token })
+            method: "POST"
          })
 
          if(!response.ok) {

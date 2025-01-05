@@ -4,7 +4,7 @@ import { User } from "../../../../database/models/User"
 
 export async function POST(req) {
 
-   const refresh_token = req.cookies.get('refresh_token').value
+   const refresh_token = req.cookies.get('refresh_token') ? req.cookies.get('refresh_token').value : ""
    let payload
 
    try
