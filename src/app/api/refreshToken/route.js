@@ -11,7 +11,7 @@ export async function POST(req) {
    {
       payload = jwt.verify(refresh_token, process.env.JWT_SECRET_KEY)
    }
-   catch (error) 
+   catch (error)
    {
       return new Response(JSON.stringify(
          { error: { message: "Refresh token inválido ou expirado!", code: "INVALID_REFRESH_TOKEN" } }
@@ -28,9 +28,9 @@ export async function POST(req) {
 
 
    const data = { email: user.email, nome: user.nome, provider: user.provider, role: user.role }
-   const access_token = jwt.sign(data, process.env.JWT_SECRET_KEY)
+   const access_token = jwt.sign(data, process.env.JWT_SECRET_KEY, { expiresIn: 600 })
    
-   const cookie = `access_token=${access_token}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=60`
+   const cookie = `access_token=${access_token}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=600`
 
    return new Response(JSON.stringify(data), {
       status: 200, 

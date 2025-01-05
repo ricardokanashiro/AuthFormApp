@@ -75,11 +75,11 @@ export async function POST(request) {
 
    const user = { nome, email, role, provider }
 
-   const access_token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: 60 })
+   const access_token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: 600 })
    const refreshToken = jwt.sign({ email, provider }, process.env.JWT_SECRET_KEY, { expiresIn: '7d' })
 
    const cookie = [
-      `access_token=${access_token}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=60`, // expires in 1 hour
+      `access_token=${access_token}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=600`, // expires in 10 minutes
       `refresh_token=${refreshToken}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=604800` // expires in 7 days
    ]
 
