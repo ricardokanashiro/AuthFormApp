@@ -52,11 +52,9 @@ const page = () => {
                if(!response.ok) {
                   router.push('/')
                   setLoginData({})
-                  setisLoading(false)
                   return
                }
             }
-
          }
 
          setLoginData(loginData)
@@ -73,8 +71,6 @@ const page = () => {
 
    return (
       <div className="flex w-full h-full">
-
-         { console.log(loginData) }
 
          <div className="bg-[#fafaff] h-full w-[20rem] w-max-[20rem] pt-[2rem] pr-[1.5rem] pl-[1.5rem] pb-[2rem] shrink-0 flex flex-col">
 

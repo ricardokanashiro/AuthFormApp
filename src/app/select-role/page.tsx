@@ -10,6 +10,8 @@ import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 import CircularProgress from "@mui/material/CircularProgress"
 
+import SelectRoleSkeleton from "../../../components/SelectRoleSkeleton"
+
 interface SubmitButton {
    action: () => void,
    active: boolean,
@@ -37,6 +39,7 @@ const page = () => {
 
    const [role, setRole] = useState("")
    const [fetchLoading, setFetchLoading] = useState(false)
+   const [pageLoading, setPageLoading] = useState(true)
 
    const payload = useRef<any>({})
 
@@ -62,17 +65,20 @@ const page = () => {
 
    useEffect(() => {
 
+      setPageLoading(true)
+
       async function fetchUser() {
 
          const queryParams = new URLSearchParams(window.location.search)
          const code = queryParams.get("code") ?? ""
 
          const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
-         const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_SIGN_IN_REDIRECT_URI ?? ""
+         const redirectUri = `${process.env.NEXT_PUBLIC_HOST}/select-role`
          const clientSecret = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET ?? ""
 
          if (!code) {
             router.push("/login")
+            setPageLoading(false)
             return
          }
 
@@ -99,6 +105,7 @@ const page = () => {
             .catch((error) => console.error("Erro ao trocar o código pelo token:", error))
 
          if (!payload.current) {
+            setPageLoading(false)
             return
          }
 
@@ -109,14 +116,20 @@ const page = () => {
          )
 
          if (selectUserRes.ok) {
-            console.log("Usuário já está cadastrado!")
-            router.push("/login")
+            window.location.href = `${process.env.NEXT_PUBLIC_HOST}/login?error=USER_ALREADY_SIGN_IN`
+            setPageLoading(true)
          }
       }
 
       fetchUser()
 
    }, [])
+
+   if(pageLoading) {
+      return (
+         <SelectRoleSkeleton />
+      )
+   }
 
    return (
       <div className="w-full h-full flex justify-center items-center">

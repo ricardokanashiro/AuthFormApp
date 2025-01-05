@@ -13,6 +13,8 @@ import CircularProgress from "@mui/material/CircularProgress"
 
 import FormSkeleton from "./FormSkeleton"
 
+import { notifyError } from "../utils/notify"
+
 interface ButtonProps {
    active: boolean,
    action: () => void,
@@ -67,6 +69,13 @@ const SignInForm = () => {
 
       const data = await response.json()
 
+      if(!response.ok) {
+   
+         if(data.code === "USER_ALREADY_SIGN_IN") {
+            notifyError("Já existe um usuário cadastrado com esse email")
+         }
+      }
+
       if (response.ok) {
          router.push('/home')
          localStorage.setItem('loginData', JSON.stringify(data))
@@ -78,7 +87,7 @@ const SignInForm = () => {
    function googleSignIn() {
 
       const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
-      const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_SIGN_IN_REDIRECT_URI ?? ""
+      const redirectUri = `${process.env.NEXT_PUBLIC_HOST}/select-role`
       const scope = "openid email profile"
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${encodeURIComponent(clientId)}&scope=${encodeURIComponent(scope)}&redirect_uri=${encodeURIComponent(redirectUri)}`
@@ -297,7 +306,7 @@ const SignInForm = () => {
             </div>
 
             <p>
-               Já tem uma conta? Cadastre-se <a href="/login" className="text-[#3b37ff] font-semibold">Aqui</a>.
+               Já tem uma conta? Entre por <a href="/login" className="text-[#3b37ff] font-semibold">Aqui</a>.
             </p>
 
          </div>

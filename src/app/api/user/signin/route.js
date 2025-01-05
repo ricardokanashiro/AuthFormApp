@@ -13,7 +13,7 @@ export async function POST(request) {
    const previousUser = await User.findOne({ email, provider })
 
    if(previousUser) {
-      return new Response(JSON.stringify({ error: { message: "Usuário já está cadastrado!", code: "USER_ALREADY_SIGN_IN" } }), { status: 500 })
+      return new Response(JSON.stringify({ message: "Usuário já está cadastrado!", code: "USER_ALREADY_SIGN_IN" }), { status: 500 })
    }
 
    if (senha) {

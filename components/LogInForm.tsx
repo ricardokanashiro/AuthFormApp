@@ -8,6 +8,8 @@ import CircularProgress from "@mui/material/CircularProgress"
 
 import FormSkeleton from "./FormSkeleton"
 
+import { notifyError } from "../utils/notify"
+
 interface SubmitButtonProps {
    action: () => void,
    active: boolean,
@@ -39,7 +41,9 @@ const LogInForm = () => {
    const [fetchLoading, setFetchLoading] = useState(false)
    const [fetchGoogleLoading, setFetchGoogleLoading] = useState(false)
 
-   const code = useRef("")
+   const url = new URLSearchParams(window.location.search)
+   const error = url.get("error") ?? ""
+   const code = url.get("code") ?? ""
 
    const router = useRouter()
 
@@ -72,33 +76,72 @@ const LogInForm = () => {
    async function googleLogIn() {
 
       const scope = encodeURIComponent("openid email profile")
-      const redirect_uri = encodeURIComponent(process.env.NEXT_PUBLIC_GOOGLE_LOG_IN_REDIRECT_URI ?? "")
+      const redirect_uri = encodeURIComponent(`${process.env.NEXT_PUBLIC_HOST}/login`)
       const client_id = encodeURIComponent(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "")
       const URL = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}`
 
       window.location.href = URL
    }
 
+   useEffect(() => {      
+
+      async function validate() {
+
+         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
+            method: "GET",
+         })
+
+         const data = await response.json()
+
+         if (!response.ok) {
+
+            if(data.code === "INVALID_TOKEN") {
+
+               const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/refreshToken`, { 
+                  method: "POST"
+               })
+
+               if(!response.ok) {
+                  localStorage.clear()
+                  setIsLoading(false)
+                  return
+               }
+            }
+         }
+
+         router.push('/home')
+         setIsLoading(false)
+      }
+
+      validate()
+
+   }, [])
+
+   useEffect(() => {
+
+      if(error === "USER_ALREADY_SIGN_IN") {
+         notifyError("Um usuário com esse email já está cadastrado!")
+      }
+
+   }, [error])
+
    useEffect(() => {
 
       let payload: any
 
-      const url = new URLSearchParams(window.location.search)
-      code.current = url.get("code") ?? ""
-
       async function validateUser() {
 
-         if (!code.current) {
+         if (!code || code === "") {
             return
          }
 
          setFetchGoogleLoading(true)
 
          const data: Record<string, string> = {
-            code: code.current,
+            code: code,
             client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "",
             client_secret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET ?? "",
-            redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_LOG_IN_REDIRECT_URI ?? "",
+            redirect_uri: `${process.env.NEXT_PUBLIC_HOST}/login`,
             grant_type: "authorization_code"
          }
 
@@ -137,38 +180,7 @@ const LogInForm = () => {
 
       validateUser()
 
-      async function validate() {
-
-         const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
-            method: "GET",
-         })
-
-         const data = await response.json()
-
-         if (!response.ok) {
-
-            if(data.code === "INVALID_TOKEN") {
-
-               const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/refreshToken`, { 
-                  method: "POST"
-               })
-
-               if(!response.ok) {
-                  console.log("INVALID_REFRESH_TOKEN")
-                  localStorage.clear()
-                  setIsLoading(false)
-                  return
-               }
-            }
-         }
-
-         router.push('/home')
-         setIsLoading(false)
-      }
-
-      validate()
-
-   }, [])
+   }, [code])
 
    if(isLoading) {
       return ( <FormSkeleton /> )

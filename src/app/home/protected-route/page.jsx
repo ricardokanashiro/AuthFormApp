@@ -1,11 +1,14 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+
+import RouteSkeleton from "../../../../components/RouteSkeleton"
 
 const page = () => {
 
    const router = useRouter()
+   const [pageLoading, setPageLoading] = useState(true)
 
    useEffect(() => {
 
@@ -33,11 +36,19 @@ const page = () => {
             router.push("/home")
             return
          }
+
+         setPageLoading(false)
       }
 
       fetchUser()
 
    }, [])
+
+   if(pageLoading) {
+      return (
+         <RouteSkeleton />
+      )
+   }
 
    return (
       <div className="w-full h-full flex flex-col justify-center items-center gap-[1.5rem]">
