@@ -212,7 +212,7 @@ const LogInForm = () => {
 
       <form onSubmit={(e) => e.preventDefault()} className="w-full h-full flex gap-[2rem]">
 
-         <div className="bg-[#3b37ff] w-[4rem] h-full flex-[.7] flex flex-col justify-center items-center">
+         <div className="hidden lg:flex bg-[#3b37ff] w-[4rem] h-full flex-[.7] flex-col justify-center items-center">
 
             <div className="w-full flex flex-col justify-center items-center">
                <img src="/open-id-logo.png" alt="logo image" className="h-[16rem]" />
@@ -223,9 +223,9 @@ const LogInForm = () => {
 
          </div>
 
-         <div className="flex-1 flex flex-col items-center p-[2rem] h-full">
+         <div className="flex-1 flex flex-col items-center p-[2rem] pl-[8dvw] pr-[8dvw] sm:pl-[2rem] sm:pr-[2rem] h-full">
 
-            <div className="w-[40rem] flex flex-col flex-1 justify-center items-center">
+            <div className="w-full sm:w-[40rem] flex flex-col flex-1 justify-center items-center">
 
                <div className="w-full">
 
