@@ -25,8 +25,6 @@ const User = ({ loginData }) => {
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/delete`, {
          method: "DELETE",
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ token: loginData.token })
       })
 
       if(response.ok) {

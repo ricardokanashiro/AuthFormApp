@@ -4,11 +4,10 @@ import { User } from "../../../../../database/models/User"
 
 export async function DELETE(request) {
 
-   const body = await request.json()
-   const { token } = body
+   const access_token = request.cookies.get('refresh_token').value
 
    try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET_KEY)
+      const payload = jwt.verify(access_token, process.env.JWT_SECRET_KEY)
       await User.deleteOne({ email: payload.email, provider: payload.provider })
       return new Response(JSON.stringify({ success: "O usuário foi deletado com sucesso!" }), { status: 200 })
    } 

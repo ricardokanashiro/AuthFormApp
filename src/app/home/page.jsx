@@ -17,7 +17,10 @@ const page = () => {
 
    const router = useRouter()
 
-   function logOut() {
+   async function logOut() {
+      
+      await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/deleteCookies`, { method: "POST"})
+
       router.push("/login")
       localStorage.clear()
       setLoginData({})
@@ -29,33 +32,31 @@ const page = () => {
 
       async function validate() {
 
-         const loginDataItem = localStorage.getItem("loginData") ?? ""
-         let loginData
-
-         if (loginDataItem) {
-            loginData = JSON.parse(loginDataItem)
-         }
-
-         if (!loginDataItem || !loginData.token || !loginData) {
-            router.push('/login')
-            setLoginData({})
-            setisLoading(false)
-            return
-         }
+         const loginDataItem = localStorage.getItem("loginData")
+         const loginData = await JSON.parse(loginDataItem)
 
          const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
-            method: "POST",
-            headers: {
-               'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ token: loginData.token })
+            method: "GET"
          })
 
+         const data = await response.json()
+
          if (!response.ok) {
-            router.push('/')
-            setLoginData({})
-            setisLoading(false)
-            return
+
+            if(data.code === "INVALID_TOKEN") {
+
+               const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/refreshToken`, { 
+                  method: "POST"
+               })
+
+               if(!response.ok) {
+                  router.push('/')
+                  setLoginData({})
+                  setisLoading(false)
+                  return
+               }
+            }
+
          }
 
          setLoginData(loginData)
@@ -72,6 +73,8 @@ const page = () => {
 
    return (
       <div className="flex w-full h-full">
+
+         { console.log(loginData) }
 
          <div className="bg-[#fafaff] h-full w-[20rem] w-max-[20rem] pt-[2rem] pr-[1.5rem] pl-[1.5rem] pb-[2rem] shrink-0 flex flex-col">
 
@@ -119,7 +122,6 @@ const page = () => {
          </div>
       </div>
    )
-
 }
 
 export default page

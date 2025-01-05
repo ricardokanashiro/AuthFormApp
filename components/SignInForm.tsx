@@ -90,33 +90,30 @@ const SignInForm = () => {
 
       async function validate() {
 
-         const loginDataItem = localStorage.getItem("loginData") ?? ""
-         let loginData
-
-         if (loginDataItem) {
-            loginData = JSON.parse(loginDataItem)
-         }
-
-         if (!loginData || !loginData.token) {
-            setisLoading(false)
-            return
-         }
-
          setFetchGoogleLoading(true)
 
          const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/user/validate`, {
-            method: "POST",
-            headers: {
-               'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ token: loginData.token })
+            method: "GET"
          })
 
+         const data = await response.json()
+
          if (!response.ok) {
-            localStorage.clear()
-            setisLoading(false)
-            setFetchGoogleLoading(false)
-            return
+
+            if(data.code === "INVALID_TOKEN") {
+
+               const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/refreshToken`, { 
+                  method: "POST"
+               })
+
+               if(!response.ok) {
+                  localStorage.clear()
+                  setisLoading(false)
+                  setFetchGoogleLoading(false)
+                  return
+               }
+
+            }
          }
 
          router.push('/home')
