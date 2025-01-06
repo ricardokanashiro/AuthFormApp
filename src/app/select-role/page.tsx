@@ -116,9 +116,12 @@ const page = () => {
          )
 
          if (selectUserRes.ok) {
-            window.location.href = `${process.env.NEXT_PUBLIC_HOST}/login?error=USER_ALREADY_SIGN_IN`
             setPageLoading(true)
+            window.location.href = `${process.env.NEXT_PUBLIC_HOST}/login?error=USER_ALREADY_SIGN_IN`
+            return
          }
+
+         setPageLoading(false)
       }
 
       fetchUser()

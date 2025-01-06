@@ -9,7 +9,7 @@ export async function GET(request) {
    const user = await User.findOne({ email, provider })
 
    if(!user) {
-      return new Response(JSON.stringify({ error: "Usuário não existe!", code: "USER_DONT_EXIST" }), { status: 500 })
+      return new Response(JSON.stringify({ error: "Usuário não existe!", code: "USER_DONT_EXIST" }), { status: 400 })
    }
 
    return new Response(JSON.stringify(user), { status: 200 })

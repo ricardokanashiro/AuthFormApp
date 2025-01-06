@@ -32,6 +32,8 @@ const page = () => {
 
       async function validate() {
 
+         setisLoading(true)
+
          const loginDataItem = localStorage.getItem("loginData")
          const loginData = await JSON.parse(loginDataItem)
 
