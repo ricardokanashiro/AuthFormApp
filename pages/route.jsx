@@ -23,7 +23,7 @@ const Route = ({ loginData }) => {
    }
 
    return (
-      <div className="w-full h-full p-[4rem]">
+      <div className="w-full h-full p-[4rem] overflow-auto">
 
          <h1 className="font-bold text-[3rem]">Bem Vindo {loginData.nome}!</h1>
 
@@ -31,7 +31,7 @@ const Route = ({ loginData }) => {
 
             <p className="text-[#919190] font-medium text-[1.5rem] mb-[2rem]">ROTAS</p>
 
-            <div className="flex gap-[2rem]">
+            <div className="flex gap-[2rem] flex-wrap items-stretch lg:items-start">
 
                <RouteCard 
                   image="/unlock.svg"

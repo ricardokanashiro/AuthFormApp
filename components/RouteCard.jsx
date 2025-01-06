@@ -1,9 +1,9 @@
 const RouteCard = ({ image, title, description, action, active }) => {
 
-   const estilo = "shadow-custom bg-white w-[27rem] flex p-[2rem] rounded-[1rem] gap-[2rem]"
+   const estilo = "shadow-custom bg-white lg:w-[27rem] flex p-[2rem] rounded-[1rem] gap-[2rem] w-full min-w-[20rem] h-full"
 
    return (
-      <a href={active ? action : "/home"}>
+      <a href={active ? action : "/home"} className="flex-1 lg:grow-0">
 
          <div className={active ? estilo + " cursor-pointer" : estilo + " opacity-[0.5] cursor-default"}>
 
