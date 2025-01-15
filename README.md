@@ -46,12 +46,13 @@ Confira nessa sessão quais foram as tecnologias e conceitos mais utilizados nes
 
 ### Tecnologias utilizadas
 
-
+<span>
 <img src="https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
 <img src="https://img.shields.io/badge/Tailwind_CSS-000?style=for-the-badge&logo=tailwind-css&logoColor=38B2AC" />
 <img src="https://img.shields.io/badge/MongoDB-000?style=for-the-badge&logo=mongodb&logoColor=8bc248" />
 <img src="https://img.shields.io/badge/Bcrypt-000?style=for-the-badge&logo=bcrypt&logoColor=8bc248" />
 <img src="https://img.shields.io/badge/JWT-000?style=for-the-badge&logo=jwt&logoColor=8bc248" />
+</span>
 
 &nbsp;
 
